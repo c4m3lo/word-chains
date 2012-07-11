@@ -2,15 +2,15 @@ import re
 import argparse
 
 
-dictionary = [word[:-1] for word in open('/usr/share/dict/words').readlines()
-                   if re.match(r'[a-z]+\n', word)]
-
-
 def neighbours(cands, w1):
     return [cand for cand in cands if sum(l1 != l2 for l1, l2 in zip(cand, w1)) == 1]
 
 
-def find_shortest_path(first_word, second_word, DEBUG):
+def find_shortest_path(first_word, second_word, dict, DEBUG):
+    # Load the dictionary, discarding words with apostrophes, accents or mixed case
+    dictionary = [word[:-1].lower() for word in open(dict).readlines()
+                   if re.match(r'([a-z]+|[A-Z]+)\n', word)]
+
     if len(first_word) != len(second_word):
         raise Exception("Words must be the same length.")
 
@@ -39,11 +39,12 @@ def find_shortest_path(first_word, second_word, DEBUG):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Wordchains!')
-    parser.add_argument('-v', dest='DEBUG', action='store_true', help='display chains found')
+    parser.add_argument('-v', dest='DEBUG', action='store_true', help='display all intermediary chains found')
+    parser.add_argument('-d', dest='dict', default='/usr/share/dict/words', help='dictionary to use')
     parser.add_argument('start', help='start word')
     parser.add_argument('end', help='destination word')
     args = parser.parse_args()
-    path = find_shortest_path(args.start, args.end, args.DEBUG)
+    path = find_shortest_path(args.start, args.end, args.dict, args.DEBUG)
     if path:
         print 'Solution in %d steps:' % (len(path) - 1), path
     else:
