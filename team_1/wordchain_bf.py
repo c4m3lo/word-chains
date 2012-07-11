@@ -1,14 +1,14 @@
 import re
-import sys
 import argparse
 
 
-dictionary = [word.lower().strip() for word in
-    open('/usr/share/dict/words').readlines() if re.match(r'\w+', word)]
+dictionary = [word[:-1] for word in open('/usr/share/dict/words').readlines()
+                   if re.match(r'[a-z]+\n', word)]
 
 
 def neighbours(cands, w1):
     return [cand for cand in cands if sum(l1 != l2 for l1, l2 in zip(cand, w1)) == 1]
+
 
 def find_shortest_path(first_word, second_word, DEBUG):
     if len(first_word) != len(second_word):
